@@ -37,7 +37,7 @@ class Movie {
       // List<int> genreList = json["genre_ids"] as List<int>;
 
       return Movie(
-        id: json["id"], 
+        id: json["id"],
         video: json["video"], 
         voteCount: json["vote_count"], 
         voteAverage: json["vote_average"],
