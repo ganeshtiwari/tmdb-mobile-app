@@ -1,12 +1,16 @@
+import 'package:date_format/date_format.dart';
 import 'package:emergency/constants/constants.dart';
 import 'package:emergency/models/genre.dart';
 import 'package:emergency/models/trending.dart';
+import 'package:emergency/screens/details_screen.dart';
 import 'package:emergency/services/genre_service.dart';
 import 'package:emergency/services/trending_service.dart';
 import "package:flutter/material.dart";
 import "dart:async" show Future;
 
 class HomeScreen extends StatefulWidget {
+  static const String id = "home_screen";
+
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
@@ -15,11 +19,29 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<GenreList> genreList;
   Future<Trending> trending;
 
+  final TextEditingController searchController = TextEditingController();
+  String searchValue; 
+
   @override
   void initState() {
     super.initState();
     genreList = fetchGenre();
     trending = fetchTrending();
+
+    searchController.addListener(searchListener);
+  }
+
+  @override 
+  void dispose() {
+    searchController.dispose(); 
+    super.dispose();
+  }
+
+  void searchListener() {
+    setState(() {
+      searchValue = searchController.text;
+      // TODO: Search API for the search text and display relevant results. 
+    });
   }
 
   @override
@@ -38,6 +60,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 padding: EdgeInsets.only(left: 10, right: 10),
                 width: 250,
                 child: TextFormField(
+                  controller: searchController,
+                  autofocus: false,
                   decoration: InputDecoration(
                     hintText: "Search",
                     border: InputBorder.none,
@@ -140,13 +164,15 @@ class ReusableMovieCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    String releaseDate = formatDate(DateTime.parse(movie.releaseDate), [yyyy, ' ', M, ' ', dd]);
+    // String releaseDate = 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 30.0),
       child: Stack(
         // fit: StackFit.passthrough,
         overflow: Overflow.visible,
         children: <Widget>[
-          Card(
+          RaisedButton(
             elevation: 10.0,
             color: Color.fromRGBO(30, 39, 70, 1),
             child: Container(
@@ -158,6 +184,14 @@ class ReusableMovieCard extends StatelessWidget {
                 left: 40,
               ),
             ),
+            onPressed: () {
+              print(movie.title);
+              Navigator.pushNamed(
+                context,
+                DetailsScreen.id,
+                arguments: movie,
+              );
+            },
           ),
           Positioned(
             bottom: 25.0,
@@ -186,21 +220,21 @@ class ReusableMovieCard extends StatelessWidget {
                     child: Text(
                       "Language: ${movie.originalLanguage.toUpperCase()}",
                       textAlign: TextAlign.start,
-                      style: _titleStyle,
+                      style: _subTitleStyle,
                     ),
                   ),
                   Padding(
                     padding: const EdgeInsets.all(5.0),
                     child: Text(
                       "Popularity: ${movie.popularity.toString()}",
-                      style: _titleStyle,
+                      style: _subTitleStyle,
                     ),
                   ),
                   Padding(
                     padding: const EdgeInsets.all(5.0),
                     child: Text(
-                      "Release Date: ${movie.releaseDate}",
-                      style: _titleStyle,
+                      "Release Date: $releaseDate",
+                      style: _subTitleStyle,
                     ),
                   ),
                 ],
@@ -213,7 +247,7 @@ class ReusableMovieCard extends StatelessWidget {
             child: Container(
               width: 300,
               height: 100,
-              alignment: Alignment.topLeft,
+              alignment: Alignment.bottomLeft,
               padding: EdgeInsets.only(top: 5.0),
               child: Text(
                 movie.title,
@@ -227,9 +261,19 @@ class ReusableMovieCard extends StatelessWidget {
   }
 }
 
-const TextStyle _titleStyle = TextStyle(
+const TextStyle _subTitleStyle = TextStyle(
   fontSize: 13.0,
   wordSpacing: 0.5,
   letterSpacing: 0.1,
   color: Colors.grey,
 );
+
+
+const TextStyle _titleStyle = TextStyle(
+  fontSize: 14.0,
+  wordSpacing: 0.5,
+  letterSpacing: 0.1,
+  color: Colors.white,
+  fontWeight: FontWeight.bold
+);
+
