@@ -6,7 +6,10 @@ import 'package:emergency/screens/details_screen.dart';
 import 'package:emergency/services/genre_service.dart';
 import 'package:emergency/services/trending_service.dart';
 import "package:flutter/material.dart";
+import "package:emergency/models/movie.dart";
 import "dart:async" show Future;
+
+// TODO: Refactoring
 
 class HomeScreen extends StatefulWidget {
   static const String id = "home_screen";
@@ -17,30 +20,31 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   Future<GenreList> genreList;
-  Future<Trending> trending;
+  Future<MoviePage> moviePage;
+  int selectedGenre;
 
   final TextEditingController searchController = TextEditingController();
-  String searchValue; 
+  String searchValue;
 
   @override
   void initState() {
     super.initState();
     genreList = fetchGenre();
-    trending = fetchTrending();
-
+    moviePage = fetchMoviePage(28, 1);
+    print("Here");
     searchController.addListener(searchListener);
   }
 
-  @override 
+  @override
   void dispose() {
-    searchController.dispose(); 
+    searchController.dispose();
     super.dispose();
   }
 
   void searchListener() {
     setState(() {
       searchValue = searchController.text;
-      // TODO: Search API for the search text and display relevant results. 
+      // TODO: Search API for the search text and display relevant results.
     });
   }
 
@@ -48,7 +52,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Movies"),
+        title: Text("TMDB"),
         elevation: 0.0,
         actions: <Widget>[
           Padding(
@@ -84,28 +88,38 @@ class _HomeScreenState extends State<HomeScreen> {
                   if (snapshot.hasData) {
                     var genres = snapshot.data.genres;
                     return ListView.builder(
-                      physics: ClampingScrollPhysics(),
-                      shrinkWrap: true,
-                      scrollDirection: Axis.horizontal,
-                      itemCount: genres.length,
-                      itemBuilder: (BuildContext context, int index) => Padding(
-                        padding: EdgeInsets.all(8.0),
-                        child: RaisedButton(
-                          color: Color.fromRGBO(30, 39, 70, 1),
-                          padding: const EdgeInsets.all(5.0),
-                          child: Text(
-                            genres[index].name,
-                            style: TextStyle(
-                              fontSize: 13.0,
-                              color: Colors.grey,
+                        physics: ClampingScrollPhysics(),
+                        shrinkWrap: true,
+                        scrollDirection: Axis.horizontal,
+                        itemCount: genres.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          bool isSelected = selectedGenre == genres[index].id;
+                          return Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: RaisedButton(
+                              color: isSelected
+                                  ? Colors.purple
+                                  : Color.fromRGBO(30, 39, 70, 1),
+                              elevation: isSelected ? 0 : 5,
+                              padding: const EdgeInsets.all(5.0),
+                              child: Text(
+                                genres[index].name,
+                                style: TextStyle(
+                                  fontSize: 13.0,
+                                  color:
+                                      isSelected ? Colors.white : Colors.grey,
+                                ),
+                              ),
+                              onPressed: () {
+                                setState(() {
+                                  moviePage =
+                                      fetchMoviePage(genres[index].id, 1);
+                                  selectedGenre = genres[index].id;
+                                });
+                              },
                             ),
-                          ),
-                          onPressed: () {
-                            print(genres[index].name);
-                          },
-                        ),
-                      ),
-                    );
+                          );
+                        });
                   } else if (snapshot.hasError) {
                     return SizedBox(
                       height: 45,
@@ -122,18 +136,18 @@ class _HomeScreenState extends State<HomeScreen> {
             SizedBox(height: 10),
             SizedBox(
               height: MediaQuery.of(context).size.height / 1.2,
-              child: FutureBuilder<Trending>(
-                future: trending,
+              child: FutureBuilder<MoviePage>(
+                future: moviePage,
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
-                    List<Movie> trendingMovies = snapshot.data.results;
+                    List<Movie> movieList = snapshot.data.results;
                     return ListView.builder(
                       // scrollDirection: Axis.horizontal,
-                      itemCount: trendingMovies.length,
+                      itemCount: movieList.length,
                       itemBuilder: (context, index) {
                         return Center(
                           child: ReusableMovieCard(
-                            movie: trendingMovies[index],
+                            movie: movieList[index],
                           ),
                         );
                       },
@@ -164,8 +178,9 @@ class ReusableMovieCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String releaseDate = formatDate(DateTime.parse(movie.releaseDate), [yyyy, ' ', M, ' ', dd]);
-    // String releaseDate = 
+    String releaseDate =
+        formatDate(DateTime.parse(movie.releaseDate), [yyyy, ' ', M, ' ', dd]);
+    // String releaseDate =
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 30.0),
       child: Stack(
@@ -268,12 +283,9 @@ const TextStyle _subTitleStyle = TextStyle(
   color: Colors.grey,
 );
 
-
 const TextStyle _titleStyle = TextStyle(
-  fontSize: 14.0,
-  wordSpacing: 0.5,
-  letterSpacing: 0.1,
-  color: Colors.white,
-  fontWeight: FontWeight.bold
-);
-
+    fontSize: 14.0,
+    wordSpacing: 0.5,
+    letterSpacing: 0.1,
+    color: Colors.white,
+    fontWeight: FontWeight.bold);

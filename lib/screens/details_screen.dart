@@ -1,13 +1,10 @@
 import 'package:date_format/date_format.dart';
 import 'package:emergency/constants/constants.dart';
-import 'package:emergency/models/trending.dart';
 import "package:flutter/material.dart";
+import "package:emergency/models/movie.dart";
 
 class DetailsScreen extends StatelessWidget {
   static const String id = "details_screen";
-  // final Movie movie;
-
-  // DetailsScreen({this.movie});
 
   @override
   Widget build(BuildContext context) {
@@ -53,8 +50,7 @@ class DetailsScreen extends StatelessWidget {
                 elevation: 0.0,
                 color: Colors.transparent,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10.0)
-                ),
+                    borderRadius: BorderRadius.circular(10.0)),
                 child: Align(
                   alignment: Alignment.topLeft,
                   child: Icon(
@@ -71,17 +67,17 @@ class DetailsScreen extends StatelessWidget {
             left: 0,
             right: 0,
             child: Container(
-              height: MediaQuery.of(context).size.height / 2,
+              height: MediaQuery.of(context).size.height / 1.5,
               // width: 200,
               color: Colors.transparent,
               padding: EdgeInsets.all(10.0),
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.end,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Text(
                     movie.title,
-                    // textAlign: TextAlign.left,
+                    textAlign: TextAlign.left,
                     style: _titleStyle,
                   ),
                   SizedBox(height: 10.0),
@@ -121,37 +117,27 @@ class DetailsScreen extends StatelessWidget {
                       ],
                     ),
                   ),
-                ],
-              ),
-            ),
-          ),
-          Positioned(
-            bottom: 0,
-            left: 10,
-            right: 10,
-            child: Container(
-              height: 100,
-              // color: Colors.blueAccent,
-              padding: EdgeInsets.all(5.0),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  raisedIcon(Icons.star, () {
-                    print("Pressed");
-                  }),
-                  raisedIcon(Icons.cloud_download, () {
-                    print("Pressed");
-                  }),
-                  raisedIcon(Icons.arrow_downward, () {
-                    print("Pressed");
-                  }),
-                  raisedIcon(Icons.call_to_action, () {
-                    print("Pressed");
-                  }),
-                  raisedIcon(Icons.people, () {
-                    print("Pressed");
-                  }),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      raisedIcon(Icons.star, () {
+                        print("Pressed");
+                      }),
+                      raisedIcon(Icons.cloud_download, () {
+                        print("Pressed");
+                      }),
+                      raisedIcon(Icons.arrow_downward, () {
+                        print("Pressed");
+                      }),
+                      raisedIcon(Icons.call_to_action, () {
+                        print("Pressed");
+                      }),
+                      raisedIcon(Icons.people, () {
+                        print("Pressed");
+                      }),
+                    ],
+                  ),
                 ],
               ),
             ),
@@ -183,4 +169,4 @@ class DetailsScreen extends StatelessWidget {
 }
 
 const TextStyle _titleStyle = TextStyle(
-    fontSize: 25, color: Colors.white, wordSpacing: 1.5, letterSpacing: 0.3);
+    fontSize: 25, color: Colors.white, wordSpacing: 1.5, letterSpacing: 0.3,);
