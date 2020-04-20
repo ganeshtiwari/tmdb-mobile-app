@@ -1,7 +1,7 @@
 import 'package:date_format/date_format.dart';
 import 'package:emergency/constants/constants.dart';
 import 'package:emergency/models/genre.dart';
-import 'package:emergency/models/trending.dart';
+import 'package:emergency/models/moviepage.dart';
 import 'package:emergency/screens/details_screen.dart';
 import 'package:emergency/services/genre_service.dart';
 import 'package:emergency/services/trending_service.dart';
@@ -22,8 +22,10 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<GenreList> genreList;
   Future<MoviePage> moviePage;
   int selectedGenre;
-
-  final TextEditingController searchController = TextEditingController();
+  int currentPage;
+  List<Movie> movieList;
+  TextEditingController searchController = TextEditingController();
+  ScrollController moviePageScrollController = ScrollController();
   String searchValue;
 
   @override
@@ -33,11 +35,13 @@ class _HomeScreenState extends State<HomeScreen> {
     moviePage = fetchMoviePage(28, 1);
     print("Here");
     searchController.addListener(searchListener);
+    moviePageScrollController.addListener(moviePageScrollLisener);
   }
 
   @override
   void dispose() {
     searchController.dispose();
+    moviePageScrollController.dispose();
     super.dispose();
   }
 
@@ -46,6 +50,19 @@ class _HomeScreenState extends State<HomeScreen> {
       searchValue = searchController.text;
       // TODO: Search API for the search text and display relevant results.
     });
+  }
+
+  void moviePageScrollLisener() {
+    if (moviePageScrollController.offset >=
+            moviePageScrollController.position.maxScrollExtent &&
+        !moviePageScrollController.position.outOfRange) {
+      print("Reached the end of page");
+      setState(() {
+        Future<MoviePage> tempMoviePage =
+            fetchMoviePage(selectedGenre, currentPage + 1);
+        moviePage = tempMoviePage;
+      });
+    }
   }
 
   @override
@@ -75,6 +92,37 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
         ],
+      ),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero, 
+          children: <Widget>[
+            DrawerHeader(
+              child: Container(
+                
+              ),
+              decoration: BoxDecoration(
+                color: Colors.blue,
+              ),
+            ),
+            ListTile(
+              title: Text("Item 1"),
+              onTap: () {},
+            ),
+             ListTile(
+              title: Text("Item 1"),
+              onTap: () {},
+            ),
+             ListTile(
+              title: Text("Item 1"),
+              onTap: () {},
+            ),
+             ListTile(
+              title: Text("Item 1"),
+              onTap: () {},
+            ),
+          ],
+        ),
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -111,10 +159,13 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ),
                               ),
                               onPressed: () {
-                                setState(() {
-                                  moviePage =
-                                      fetchMoviePage(genres[index].id, 1);
-                                  selectedGenre = genres[index].id;
+                                setState(() { 
+                                  if (!isSelected) {
+                                    moviePage =
+                                        fetchMoviePage(genres[index].id, 1);
+                                    selectedGenre = genres[index].id;
+                                    movieList = [];
+                                  }
                                 });
                               },
                             ),
@@ -140,10 +191,17 @@ class _HomeScreenState extends State<HomeScreen> {
                 future: moviePage,
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
-                    List<Movie> movieList = snapshot.data.results;
+                    List<Movie> tempMovieList = snapshot.data.results;
+                    currentPage = snapshot.data.page;
+                    if (movieList != null) {
+                      movieList = movieList + tempMovieList;
+                    } else {
+                      movieList = tempMovieList;
+                    }
                     return ListView.builder(
                       // scrollDirection: Axis.horizontal,
                       itemCount: movieList.length,
+                      controller: moviePageScrollController,
                       itemBuilder: (context, index) {
                         return Center(
                           child: ReusableMovieCard(

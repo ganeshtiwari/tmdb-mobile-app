@@ -3,7 +3,7 @@ import "dart:convert";
 import "package:http/http.dart" as http;
 
 import 'package:emergency/constants/constants.dart';
-import 'package:emergency/models/trending.dart';
+import 'package:emergency/models/moviepage.dart';
 
 Future<MoviePage> fetchMoviePage(int genreId, int pageNO) async {
   final String url = AIP_ENDPOINT +
