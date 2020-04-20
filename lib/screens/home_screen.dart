@@ -9,6 +9,8 @@ import "package:flutter/material.dart";
 import "package:emergency/models/movie.dart";
 import "dart:async" show Future;
 
+import 'package:flutter_svg/flutter_svg.dart';
+
 // TODO: Refactoring
 
 class HomeScreen extends StatefulWidget {
@@ -27,6 +29,8 @@ class _HomeScreenState extends State<HomeScreen> {
   TextEditingController searchController = TextEditingController();
   ScrollController moviePageScrollController = ScrollController();
   String searchValue;
+
+  final String tmdbLogoSVG = 'assets/images/tmdb.svg';
 
   @override
   void initState() {
@@ -94,34 +98,44 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
       drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero, 
-          children: <Widget>[
-            DrawerHeader(
-              child: Container(
-                
+        child: Container(
+          color: Color.fromRGBO(30, 39, 70, 1),
+          child: ListView(
+            // padding: EdgeInsets.zero,
+            children: <Widget>[
+              Container(
+                height: MediaQuery.of(context).size.height / 1.7,
+                child: DrawerHeader(
+                  child: SvgPicture.network(
+                    'https://www.themoviedb.org/assets/2/v4/logos/v2/blue_square_2-d537fb228cf3ded904ef09b136fe3fec72548ebc1fea3fbbd1ad9e36364db38b.svg',
+                    // semanticsLabel: 'logo',
+                    color: Colors.blue[400],
+                    // color: Color.fromRGBO(13, 37, 63, 1),
+                  ),
+                ),
               ),
-              decoration: BoxDecoration(
-                color: Colors.blue,
+              ListTile(
+                title: Text("Profile"),
+                trailing: Icon(Icons.people, size: 20.0),
+                onTap: () {},
               ),
-            ),
-            ListTile(
-              title: Text("Item 1"),
-              onTap: () {},
-            ),
-             ListTile(
-              title: Text("Item 1"),
-              onTap: () {},
-            ),
-             ListTile(
-              title: Text("Item 1"),
-              onTap: () {},
-            ),
-             ListTile(
-              title: Text("Item 1"),
-              onTap: () {},
-            ),
-          ],
+              ListTile(
+                title: Text("Settings"),
+                trailing: Icon(Icons.settings, size: 20.0),
+                onTap: () {},
+              ),
+              ListTile(
+                title: Text("Favorites"),
+                trailing: Icon(Icons.star, size: 20.0),
+                onTap: () {},
+              ),
+              ListTile(
+                title: Text("Logout"),
+                trailing: Icon(Icons.all_out),
+                onTap: () {},
+              )
+            ],
+          ),
         ),
       ),
       body: SingleChildScrollView(
@@ -159,14 +173,14 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ),
                               ),
                               onPressed: () {
-                                setState(() { 
-                                  if (!isSelected) {
+                                if (!isSelected) {
+                                  setState(() {
                                     moviePage =
                                         fetchMoviePage(genres[index].id, 1);
                                     selectedGenre = genres[index].id;
                                     movieList = [];
-                                  }
-                                });
+                                  });
+                                }
                               },
                             ),
                           );
